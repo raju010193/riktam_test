@@ -4,8 +4,6 @@ from rest_framework.test import APITestCase
 from .models import AppUser
 from faker import Faker
 
-fake = Faker()
-
 
 # Create your tests here.
 # class Base(object):
@@ -31,6 +29,9 @@ class AccountTests(APITestCase):
         self.username = f"{self.first_name.replace(' ', '')}{self.last_name.replace(' ', '')}".lower()
 
     def create_account(self):
+        """
+        Create account
+        """
         url = reverse('register')
         data = {'first_name': self.first_name,
                 'last_name': self.last_name, 'username': self.username, 'email': f"{self.username}@gmail.com",
@@ -42,7 +43,7 @@ class AccountTests(APITestCase):
 
     def test_create_account(self):
         """
-        Ensure we can create a new account object.
+        create account test case
         """
         # url = reverse('register')
         response = self.create_account()
@@ -57,6 +58,9 @@ class AccountTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_update_account(self):
+        """
+        Update account test case
+        """
         url = reverse('register')
         self.create_account()
         self.client.credentials(
@@ -75,7 +79,28 @@ class AccountTests(APITestCase):
         response = self.client.put(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    def test_delete_account(self):
+        """
+        Delete account test case
+        """
+        url = reverse('register')
+        self.create_account()
+        self.client.credentials(
+            HTTP_AUTHORIZATION='Bearer ' + self.token)
+        response = self.client.get(url, format='json')
+        data = response.data.get('data')
+        status_code = 404
+        if data:
+            update_uuid = data[0].get('uuid')
+            status_code = 200
+        self.assertEqual(status_code, status.HTTP_200_OK)
+        response = self.client.delete(f"{url}?uuid={update_uuid}", data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
     def test_login(self):
+        """
+        test Login test case
+        """
         url = reverse('user_login')
         self.create_account()
         username = self.username
@@ -84,3 +109,27 @@ class AccountTests(APITestCase):
         data = {'username': username, "password": self.password}
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_logout(self):
+        """
+        test logout test case
+        """
+        url = reverse('user_login')
+        self.create_account()
+        username = self.username
+        self.client.credentials(
+            HTTP_AUTHORIZATION='')
+        data = {'username': username, "password": self.password}
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        refresh_token = response.data.get('data').get('token').get('refresh_token')
+        access_token = response.data.get('data').get('token').get('access_token')
+        logout_url = reverse('user_logout')
+        self.client.credentials(
+            HTTP_AUTHORIZATION='Bearer '+access_token)
+        data = {
+            'refresh':refresh_token
+        }
+        response = self.client.post(logout_url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+

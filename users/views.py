@@ -1,11 +1,13 @@
 from django.shortcuts import render
 from rest_framework import viewsets, generics, status
+from rest_framework.views import APIView
 from riktam_test.response_util import response_format
 from rest_framework.request import Request
 from .serializer import LoginSerializer, RegisterSerializer, AppUser
 from rest_framework.permissions import BasePermission, IsAuthenticated
 from .permissions import IsAdminAuthenticated
 from django.db import IntegrityError
+from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model, authenticate
 
 import logging
@@ -16,6 +18,9 @@ LOG = logging.getLogger(__name__)
 # Create your views here.
 
 class LoginAPI(generics.GenericAPIView):
+    """
+    Login API
+    """
     serializer_class = LoginSerializer
 
     def post(self, request):
@@ -28,6 +33,10 @@ class LoginAPI(generics.GenericAPIView):
 
 
 class RegisterAPI(generics.GenericAPIView):
+    """
+    Manage users API
+    """
+
     permission_classes = [IsAdminAuthenticated]
     serializer_class = RegisterSerializer
 
@@ -122,12 +131,12 @@ class RegisterAPI(generics.GenericAPIView):
         """
         try:
 
-            uuid = req.GET.get('uuid')
+            user_uuid = req.GET.get('uuid')
             user_model = get_user_model()
-            data = user_model.objects.filter(uuid=uuid).first()
+            data = user_model.objects.filter(uuid=user_uuid).first()
             if data:
                 data.delete()
-                LOG.info('{0} user deleted '.format(username))
+                LOG.info('{0} user deleted '.format(user_uuid))
             return response_format(message="User deleted successfully!", status=status.HTTP_200_OK)
         except Exception as e:
             LOG.error(e, exc_info=True)
