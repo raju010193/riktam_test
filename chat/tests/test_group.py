@@ -23,6 +23,10 @@ class GroupChatTests(Base):
         self.second_user_username = f"{self.second_user_first_name.replace(' ', '')}{self.second_user_last_name.replace(' ', '')}".lower()
 
     def create_account(self, data):
+        """
+        Create account
+        @param data
+        """
         url = reverse('register')
 
         self.client.credentials(
@@ -31,6 +35,10 @@ class GroupChatTests(Base):
         return response
 
     def get_login(self, data):
+        """
+        Login
+        @param data
+        """
         url = reverse('user_login')
         self.client.credentials(
             HTTP_AUTHORIZATION='')
@@ -38,6 +46,10 @@ class GroupChatTests(Base):
         return response
 
     def create_group(self, token):
+        """
+        Create group
+        @param token
+        """
         url = reverse('group')
 
         self.client.credentials(
@@ -50,6 +62,10 @@ class GroupChatTests(Base):
         return response
 
     def get_groups(self, token):
+        """
+        Get groups
+        @param token
+        """
         url = reverse('group')
         self.client.credentials(
             HTTP_AUTHORIZATION='Bearer ' + token)
@@ -57,6 +73,10 @@ class GroupChatTests(Base):
         return response
 
     def get_users(self, token):
+        """
+        Get users
+        @param token
+        """
         user_url = reverse('users')
         self.client.credentials(
             HTTP_AUTHORIZATION='Bearer ' + token)
@@ -64,10 +84,16 @@ class GroupChatTests(Base):
         return response
 
     def test_create_group(self):
+        """
+        create group test
+        """
         response = self.create_group(self.token)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_delete_group(self):
+        """
+        Delete group test
+        """
         first_user_data = {'first_name': self.first_name,
                            'last_name': self.last_name, 'username': self.username,
                            'email': f"{self.username}@gmail.com",
@@ -90,6 +116,9 @@ class GroupChatTests(Base):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_search_group(self):
+        """
+        Search group test
+        """
         first_user_data = {'first_name': self.first_name,
                            'last_name': self.last_name, 'username': self.username,
                            'email': f"{self.username}@gmail.com",
@@ -109,6 +138,9 @@ class GroupChatTests(Base):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_add_members_group(self):
+        """
+        Add group member test
+        """
         first_user_data = {'first_name': self.first_name,
                            'last_name': self.last_name, 'username': self.username,
                            'email': f"{self.username}@gmail.com",
@@ -149,6 +181,9 @@ class GroupChatTests(Base):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_send_group_message(self):
+        """
+        Send message in group test
+        """
         first_user_data = {'first_name': self.first_name,
                            'last_name': self.last_name, 'username': self.username,
                            'email': f"{self.username}@gmail.com",
@@ -196,6 +231,9 @@ class GroupChatTests(Base):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_get_group_message(self):
+        """
+        get group messages test
+        """
         first_user_data = {'first_name': self.first_name,
                            'last_name': self.last_name, 'username': self.username,
                            'email': f"{self.username}@gmail.com",
@@ -246,6 +284,9 @@ class GroupChatTests(Base):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_search_user(self):
+        """
+        Search User test case
+        """
         first_user_data = {'first_name': self.first_name,
                            'last_name': self.last_name, 'username': self.username,
                            'email': f"{self.username}@gmail.com",
