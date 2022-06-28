@@ -14,7 +14,7 @@ LOG = logging.getLogger(__name__)
 
 
 class GroupAPI(generics.GenericAPIView):
-    permission_classes = [IsAdminAuthenticated]
+    permission_classes = [IsAuthenticated]
     serializer_class = CreateGroupSerializer
     utility_class = GroupUtils
 
@@ -42,9 +42,9 @@ class GroupAPI(generics.GenericAPIView):
         """
         try:
 
-            # username = req.GET.get('username')
+            search_key = req.GET.get('search')
             # user_model = get_user_model()
-            data = self.utility_class(user=req.user).get_groups().values('uuid', 'name',
+            data = self.utility_class(user=req.user).get_groups(search_key).values('uuid', 'name',
                                                                          'group_info',
                                                                          )
             LOG.info('fetching user details ')
@@ -65,7 +65,7 @@ class GroupAPI(generics.GenericAPIView):
                                        status=status.HTTP_400_BAD_REQUEST)
             utility_obj = self.utility_class(user=req.user)
             utility_obj.update_group(**serializer_data.validated_data)
-            LOG.info('{0} Group added')
+            LOG.info('{0} Group updated')
             return response_format(data=serializer_data.data, status=status.HTTP_201_CREATED)
         except Exception as e:
             LOG.error(e, exc_info=True)
@@ -81,6 +81,7 @@ class GroupAPI(generics.GenericAPIView):
             group_id = req.GET.get('group_id')
             # user_model = get_user_model()
             self.utility_class(user=req.user).delete_group(group_id=group_id)
+            LOG.info("group deleted")
             return response_format(message="User deleted successfully!", status=status.HTTP_200_OK)
         except Exception as e:
             LOG.error(e, exc_info=True)

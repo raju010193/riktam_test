@@ -96,11 +96,14 @@ class GroupUtils(BaseUtils):
         pass
 
     @staticmethod
-    def get_groups():
+    def get_groups(search_key=None):
         """
         Get all groups
         """
-        return Groups.objects.all()
+        filter_data = dict()
+        if search_key:
+            filter_data['name__icontains'] = search_key
+        return Groups.objects.filter(**filter_data)
 
     @staticmethod
     def get_group_messages(group_id):

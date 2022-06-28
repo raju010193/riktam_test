@@ -68,10 +68,13 @@ class UsersViewsAPI(generics.GenericAPIView):
         try:
 
             username = req.GET.get('username')
+            search = req.GET.get('search')
             user_model = get_user_model()
             filter_data = dict()
             if username:
                 filter_data['username'] = username
+            if search:
+                filter_data['username__icontains'] = search
             data = user_model.objects.filter(**filter_data).exclude(username=req.user.username).values('uuid',
                                                                                                        'first_name',
                                                                                                        'last_name',
